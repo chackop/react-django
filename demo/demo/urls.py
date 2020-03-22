@@ -11,6 +11,7 @@ router = DefaultRouter()
 router.register(r'packages', api.views.PackageViewSet)
 router.register(r'wishlist', api.views.WishlistItemViewSet)
 router.register(r'public/packages', api.views.PublicPackageViewSet)
+router.register(r'bookings', api.views.BookingViewSet)
 
 urlpatterns = [
     re_path(r'^api/v1/', include(router.urls)),

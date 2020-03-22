@@ -10,7 +10,6 @@ class PackageSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     STREET_ADDRESS_ERROR = 'Street address must be in the format "11 Abc St."'
-
     class Meta:
         model = Booking
         fields = '__all__'

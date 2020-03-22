@@ -111,3 +111,8 @@ class PublicPackageViewSet(viewsets.ModelViewSet):
     pagination_class = PackagePagination
     filter_backends = (PackagePriceFilterBackend, SearchFilter)
     search_fields = ('name', 'promo')
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = [BasePermission]
