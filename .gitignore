@@ -1,0 +1,4 @@
+/env
+/demo/api/__pycache__
+/demo/api/migrations/__pycache__
+/demo/demo/__pycache__
