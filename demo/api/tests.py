@@ -30,7 +30,6 @@ def auth_header(token):
 class CachingTestCase(APITestCase):
     def test_wishlist_cache(self):
         package = Package.objects.create(category='a', name='package', price=0.0, rating='medium', tour_length=1)
-
         self.assertIsNone(cache.get('wishlist:wishlist-items'))
         response = self.client.get('/api/v1/wishlist/')
         self.assertListEqual(response.data, [])
@@ -52,6 +51,7 @@ class SortingFilteringTestCase(APITestCase):
         expensive_package = Package.objects.create(category='b', name='b', price=99.0, rating='medium', tour_length=2)
         user = User.objects.create(username='user')
         token = create_access_token(user)
+
         response = self.client.get('/api/v1/public/packages/', **auth_header(token))
         ids = list(map(lambda result: result['id'], response.data['results']))
         self.assertListEqual(ids, [expensive_package.id, discount_package.id])
@@ -73,14 +73,13 @@ class ValidationTestCase(APITestCase):
             'city': 'City',
             'package': 1,
         }
-
         response = self.client.post('/api/v1/bookings/', data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data['street_address'][0],
             BookingSerializer.STREET_ADDRESS_ERROR
         )
-
         data['street_address'] = '11 Abc St.'
         response = self.client.post('/api/v1/bookings/', data)
         self.assertEqual(response.status_code, 201)
+
