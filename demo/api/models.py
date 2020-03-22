@@ -22,6 +22,11 @@ class WishlistItem(models.Model):
     package = models.ForeignKey(Package, null=True, on_delete=models.SET_NULL)
     added_to_cart = models.BooleanField(default=False)
 
+    def __str__(self):
+        return '{} - {} (added to cart? {})'.format(
+            self.session_id, self.package.name, self.added_to_cart
+        )
+
 class Booking(models.Model):
     name = models.CharField(max_length=200)
     email_address = models.CharField(max_length=200)

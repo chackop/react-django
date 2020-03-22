@@ -43,6 +43,16 @@ class WishlistItemViewSet(viewsets.ViewSet):
     permission_classes = [BasePermission]
     session_id = 'wishlist-items'
 
+    def destroy(self, request, pk=None):
+        package_id = pk
+        item = self.queryset.filter(
+            session_id=self.session_id,
+            package__in=[package_id],
+        )
+        item.delete()
+        cache.delete('wishlist:{}'.format(self.session_id))
+        return Response('Item removed from wishlist', status=200)
+
     def update(self, request, pk=None):
         return Response()
 
@@ -76,18 +86,28 @@ class WishlistItemViewSet(viewsets.ViewSet):
         cache.delete('wishlist:{}'.format(self.session_id))
         return Response('Item added to wishlist', status=200)
 
-    def destroy(self, request, pk=None):
-        package_id = pk
-        item = self.queryset.filter(session_id=self.session_id, package__in=[package_id])
-        item.delete()
-        cache.delete('wishlist:{}'.format(self.session_id))
-        return Response('Item removed from wishlist', status=200)
-
     def retrieve(self, request, pk=None):
         return Response()
+
+class PackagePagination(PageNumberPagination):
+    page_size = 9
+
+class PackagePriceFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        filters = {}
+        price_min = request.query_params.get('price_min', None)
+        if price_min:
+            filters['price__gte'] = price_min
+        price_max = request.query_params.get('price_max', None)
+        if price_max:
+            filters['price__lte'] = price_max
+        return queryset.filter(**filters)
 
 class PublicPackageViewSet(viewsets.ModelViewSet):
     permission_classes = [TokenHasScope]
     required_scopes = ['read']
     queryset = Package.objects.all().order_by('-price')
     serializer_class = PackageSerializer
+    pagination_class = PackagePagination
+    filter_backends = (PackagePriceFilterBackend, SearchFilter)
+    search_fields = ('name', 'promo')
